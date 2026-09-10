@@ -1,0 +1,17 @@
+# Normalize line endings: Git stores LF, checks out native
+* text=auto
+
+# Explicit rules for common types
+*.cs        text diff=csharp
+*.csproj    text
+*.slnx      text
+*.json      text
+*.md        text
+*.http      text
+*.sh        text eol=lf
+*.ps1       text eol=crlf
+
+# Binary
+*.png       binary
+*.jpg       binary
+*.pfx       binary

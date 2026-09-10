@@ -1,0 +1,66 @@
+# ---------------------------------------------
+# .NET / Visual Studio
+# ---------------------------------------------
+[Bb]in/
+[Oo]bj/
+[Oo]ut/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+build/
+bld/
+[Ll]og/
+[Ll]ogs/
+
+# Visual Studio / Rider / VS Code
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.rsuser
+
+# Build & test results
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+*.trx
+*.coverage
+*.coveragexml
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# NuGet
+*.nupkg
+*.snupkg
+.nuget/
+packages/
+!packages/build/
+
+# ---------------------------------------------
+# Secrets / local config
+# ---------------------------------------------
+appsettings.*.local.json
+secrets.json
+*.pfx
+*.key
+.env
+.env.*
+
+# ---------------------------------------------
+# Claude Code
+# ---------------------------------------------
+**/.claude/settings.local.json
+
+# ---------------------------------------------
+# OS
+# ---------------------------------------------
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
