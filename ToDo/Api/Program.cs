@@ -9,6 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddApplicationServices();
 builder.Services.AddDataRepositories();
+builder.Services.AddExceptionHandler(builder.Environment);
 builder.Services.AddFeatureManagement();
 
 builder.Services.ConfigureHttpJsonOptions(options =>
@@ -26,6 +27,11 @@ builder.Services.AddValidation();
 builder.Host.AddSerilogLogging();
 
 var app = builder.Build();
+
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler();
+}
 
 app.MapToDoTaskEndpoints();
 
@@ -49,7 +55,7 @@ var summaries = new[]
 
 app.MapGet("/weatherforecast", () =>
 {
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
+    var forecast = Enumerable.Range(1, 5).Select(index =>
         new WeatherForecast
         (
             DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
