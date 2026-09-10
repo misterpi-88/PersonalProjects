@@ -16,22 +16,30 @@ public static class ToDoTaskEndpoints
         group.MapGet("listing/{p:int:min(1)}", GetListing);
 
         group.MapPost("/", Create).ProducesValidationProblem();
-        
+
         group.MapPut("{id:int}", Update).ProducesValidationProblem();
-        
+
         group.MapDelete("{id:int}", Delete);
 
         return app;
     }
 
-    public static async Task<Results<Ok<GetToDoTaskDto>, NotFound>> Get(int id, IToDoTaskService toDoTaskService)
+    public static async Task<Results<Ok<GetToDoTaskDto>, NotFound>> Get(int id, IToDoTaskService toDoTaskService, ILoggerFactory loggerFactory)
     {
+        var logger = loggerFactory.CreateLogger(typeof(ToDoTaskEndpoints).FullName!);
+
+        logger.LogDebug("Running Get Method (id: {0})", id);
+
         var toDoTask = await toDoTaskService.Get(id);
 
         if (toDoTask == null)
         {
+            logger.LogDebug("The task is not found (id: {0})", id);
+
             return TypedResults.NotFound();
         }
+
+        logger.LogDebug("The task is found (id: {0})", id);
 
         return TypedResults.Ok(toDoTask);
     }
