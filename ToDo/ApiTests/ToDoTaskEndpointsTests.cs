@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System.Net.Http.Headers;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -45,7 +46,7 @@ public class ToDoTaskEndpointsTests
     {
         var id = 1;
 
-        _toDoTaskServiceMock.Setup(x=> x.Get(id)).ReturnsAsync(new GetToDoTaskDto
+        _toDoTaskServiceMock.Setup(x => x.Get(id)).ReturnsAsync(new GetToDoTaskDto
         {
             Id = id,
             Task = "Write some unit tests",
@@ -66,13 +67,13 @@ public class ToDoTaskEndpointsTests
             Id = id,
             Task = "Write some unit tests",
             Created = DateTime.UtcNow
-        } ;
+        };
 
-        _toDoTaskServiceMock.Setup(x=> x.Get(id)).ReturnsAsync(expectedResult);
+        _toDoTaskServiceMock.Setup(x => x.Get(id)).ReturnsAsync(expectedResult);
 
         var act = await ToDoTaskEndpoints.Get(id, _toDoTaskServiceMock.Object, _loggerFactory, _httpContext);
 
-        Assert.Equal(expectedResult,((Ok<GetToDoTaskDto>)act.Result).Value);
+        Assert.Equal(expectedResult, ((Ok<GetToDoTaskDto>)act.Result).Value);
     }
 
     [Fact]
@@ -80,10 +81,98 @@ public class ToDoTaskEndpointsTests
     {
         var id = 1;
 
-        _toDoTaskServiceMock.Setup(x=> x.Get(id)).ThrowsAsync(new Exception("Broken"));
+        _toDoTaskServiceMock.Setup(x => x.Get(id)).ThrowsAsync(new Exception("Broken"));
 
         var act = await ToDoTaskEndpoints.Get(id, _toDoTaskServiceMock.Object, _loggerFactory, _httpContext);
 
         Assert.IsType<InternalServerError>(act.Result);
+    }
+
+    [Fact]
+    public async Task GetListing_WhenCalled_CallsService()
+    {
+        var listing = new ToDoTaskListingDto
+        {
+            Page = 1,
+            PageSize = 20
+        } ;
+
+        var act = await ToDoTaskEndpoints.GetListing(listing, _toDoTaskServiceMock.Object);
+
+        _toDoTaskServiceMock.Verify(x => x.GetListing(listing), Times.Once);
+    }
+
+    [Theory]
+    [InlineData(3, 2)]
+    [InlineData(4, 3)]
+    [InlineData(6, 3)]
+    public async Task GetListing_PageGreaterThanTotalPages_ReturnsNotFound(int page, int totalPages)
+    {
+        var listing = new ToDoTaskListingDto
+        {
+            Page = page,
+            PageSize = 20
+        };
+
+        _toDoTaskServiceMock.Setup(x => x.GetListing(listing)).ReturnsAsync(new ToDoTaskListingResultDto
+        {
+            Results = [],
+            TotalPages = totalPages,
+            TotalResults = 10
+        });
+
+        var act = await ToDoTaskEndpoints.GetListing(listing, _toDoTaskServiceMock.Object);
+
+        Assert.IsType<NotFound>(act.Result);
+    }
+
+    [Theory]
+    [InlineData(1, 0)]
+    [InlineData(2, 2)]
+    [InlineData(2, 3)]
+    public async Task GetListing_PageLessOrEqualToTotalPages_ReturnsOk(int page, int totalPages)
+    {
+        var listing = new ToDoTaskListingDto
+        {
+            Page = page,
+            PageSize = 20
+        };
+
+        _toDoTaskServiceMock.Setup(x => x.GetListing(listing)).ReturnsAsync(new ToDoTaskListingResultDto
+        {
+            Results = [],
+            TotalPages = totalPages,
+            TotalResults = 10
+        });
+
+        var act = await ToDoTaskEndpoints.GetListing(listing, _toDoTaskServiceMock.Object);
+
+        Assert.IsType<Ok<ToDoTaskListingResultDto>>(act.Result);
+    }
+
+    [Theory]
+    [InlineData(1, 0)]
+    [InlineData(2, 2)]
+    [InlineData(2, 3)]
+    public async Task GetListing_PageLessOrEqualToTotalPages_ReturnsExpectedResult(int page, int totalPages)
+    {
+        var listing = new ToDoTaskListingDto
+        {
+            Page = page,
+            PageSize = 20
+        };
+
+        var expectedResult = new ToDoTaskListingResultDto
+        {
+            Results = [],
+            TotalPages = totalPages,
+            TotalResults = 10
+        };
+
+        _toDoTaskServiceMock.Setup(x => x.GetListing(listing)).ReturnsAsync(expectedResult);
+
+        var act = await ToDoTaskEndpoints.GetListing(listing, _toDoTaskServiceMock.Object);
+
+        Assert.Equal(expectedResult, ((Ok<ToDoTaskListingResultDto>)act.Result).Value);
     }
 }
