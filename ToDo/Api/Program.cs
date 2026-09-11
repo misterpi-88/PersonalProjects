@@ -11,6 +11,7 @@ builder.Services.AddApplicationServices();
 builder.Services.AddDataRepositories();
 builder.Services.AddExceptionHandler(builder.Environment);
 builder.Services.AddFeatureManagement();
+builder.Services.AddConfigurationOptions();
 
 builder.Services.ConfigureHttpJsonOptions(options =>
 {
