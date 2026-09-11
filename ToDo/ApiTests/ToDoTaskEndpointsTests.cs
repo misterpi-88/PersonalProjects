@@ -95,7 +95,7 @@ public class ToDoTaskEndpointsTests
         {
             Page = 1,
             PageSize = 20
-        } ;
+        };
 
         var act = await ToDoTaskEndpoints.GetListing(listing, _toDoTaskServiceMock.Object);
 
@@ -174,5 +174,110 @@ public class ToDoTaskEndpointsTests
         var act = await ToDoTaskEndpoints.GetListing(listing, _toDoTaskServiceMock.Object);
 
         Assert.Equal(expectedResult, ((Ok<ToDoTaskListingResultDto>)act.Result).Value);
+    }
+
+    [Fact]
+    public async Task Create_WhenCalled_CallsService()
+    {
+        var createToDoTask = new CreateToDoTaskDto
+        {
+            Task = "Write some unit tests",
+        };
+
+        var act = await ToDoTaskEndpoints.Create(createToDoTask, _toDoTaskServiceMock.Object);
+
+        _toDoTaskServiceMock.Verify(x => x.Create(createToDoTask), Times.Once);
+    }
+
+    [Fact]
+    public async Task Create_WhenCalled_ReturnsCreated()
+    {
+        var createToDoTask = new CreateToDoTaskDto
+        {
+            Task = "Write some unit tests",
+        };
+
+        var act = await ToDoTaskEndpoints.Create(createToDoTask, _toDoTaskServiceMock.Object);
+
+        Assert.IsType<Created>(act);
+    }
+
+    [Fact]
+    public async Task Update_WhenCalled_CallsService()
+    {
+        var id = 1;
+
+        var updateToDoTask = new UpdateToDoTaskDto
+        {
+            Task = "Write some unit tests",
+        };
+
+        var act = await ToDoTaskEndpoints.Update(id, updateToDoTask, _toDoTaskServiceMock.Object);
+
+        _toDoTaskServiceMock.Verify(x => x.Update(id, updateToDoTask), Times.Once);
+    }
+
+    [Fact]
+    public async Task Update_CanNotUpdate_ReturnsNotFound()
+    {
+        var id = 1;
+
+        var updateToDoTask = new UpdateToDoTaskDto
+        {
+            Task = "Write some unit tests",
+        };
+
+        var act = await ToDoTaskEndpoints.Update(id, updateToDoTask, _toDoTaskServiceMock.Object);
+
+        Assert.IsType<NotFound>(act.Result);
+    }
+
+    [Fact]
+    public async Task Update_CanUpdate_ReturnsNoContent()
+    {
+        var id = 1;
+
+        var updateToDoTask = new UpdateToDoTaskDto
+        {
+            Task = "Write some unit tests",
+        };
+
+        _toDoTaskServiceMock.Setup(s => s.Update(id, updateToDoTask)).ReturnsAsync(true);
+
+        var act = await ToDoTaskEndpoints.Update(id, updateToDoTask, _toDoTaskServiceMock.Object);
+
+        Assert.IsType<NoContent>(act.Result);
+    }
+
+    [Fact]
+    public async Task Delete_WhenCalled_CallsService()
+    {
+        var id = 1;
+
+        var act = await ToDoTaskEndpoints.Delete(id, _toDoTaskServiceMock.Object);
+
+        _toDoTaskServiceMock.Verify(x => x.Delete(id), Times.Once);
+    }
+
+    [Fact]
+    public async Task Delete_CanNotDelete_ReturnsNotFound()
+    {
+        var id = 1;
+
+        var act = await ToDoTaskEndpoints.Delete(id,  _toDoTaskServiceMock.Object);
+
+        Assert.IsType<NotFound>(act.Result);
+    }
+
+    [Fact]
+    public async Task Delete_CanDelete_ReturnsNoContent()
+    {
+        var id = 1;
+
+        _toDoTaskServiceMock.Setup(s => s.Delete(id)).ReturnsAsync(true);
+
+        var act = await ToDoTaskEndpoints.Delete(id, _toDoTaskServiceMock.Object);
+
+        Assert.IsType<NoContent>(act.Result);
     }
 }
