@@ -3,6 +3,7 @@ using ToDo.Application;
 using ToDo.Infrastructure;
 using System.Text.Json.Serialization;
 using Microsoft.FeatureManagement;
+using ToDo.Application.Common.Transformers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,7 +23,10 @@ builder.Services.ConfigureHttpJsonOptions(options =>
 builder.Services.AddToDoDbContext(builder.Configuration);
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+builder.Services.AddOpenApi(options =>
+{
+    options.AddDocumentTransformer<ApiKeySecurityTransformer>();
+});
 
 builder.Services.AddValidation();
 
