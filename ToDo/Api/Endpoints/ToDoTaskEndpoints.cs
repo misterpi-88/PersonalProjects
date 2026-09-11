@@ -9,7 +9,7 @@ public static class ToDoTaskEndpoints
 {
     public static WebApplication MapToDoTaskEndpoints(this WebApplication app)
     {
-        var group = app.MapGroup("/api/to-do-tasks").AddEndpointFilter<ToDoTaskEndpointFilter>().ProducesProblem(StatusCodes.Status500InternalServerError);
+        var group = app.MapGroup("/api/to-do-tasks").AddEndpointFilter<ToDoTaskEndpointFilter>().ProducesProblem(StatusCodes.Status500InternalServerError).RequireAuthorization();
 
         group.MapGet("{id:int}", Get);
 

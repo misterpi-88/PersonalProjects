@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using ToDo.Application.Common.Handlers;
 using ToDo.Application.Common.Options;
+using Microsoft.AspNetCore.Authentication;
 
 namespace ToDo.Application;
 
@@ -43,6 +44,22 @@ public static class ConfigureServices
     {
         services.AddOptions<ApiOptions>()
             .BindConfiguration("Api");
+
+        return services;
+    }
+
+    public static IServiceCollection AddApiKeyAuthorization(this IServiceCollection services)
+    {
+        services.AddAuthorization(options =>
+        {
+            options.AddPolicy("ApiKeyPolicy", policy =>
+            {
+                policy.AddAuthenticationSchemes(ApiKeyAuthenticationHandler.SchemeName);
+                policy.RequireAuthenticatedUser();
+            });
+        });
+
+        services.AddAuthentication().AddScheme<AuthenticationSchemeOptions, ApiKeyAuthenticationHandler>(ApiKeyAuthenticationHandler.SchemeName, null);
 
         return services;
     }

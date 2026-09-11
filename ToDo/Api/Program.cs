@@ -12,6 +12,7 @@ builder.Services.AddDataRepositories();
 builder.Services.AddExceptionHandler(builder.Environment);
 builder.Services.AddFeatureManagement();
 builder.Services.AddConfigurationOptions();
+builder.Services.AddApiKeyAuthorization();
 
 builder.Services.ConfigureHttpJsonOptions(options =>
 {
