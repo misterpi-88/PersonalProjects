@@ -2,4 +2,5 @@
   <Project Path="Api/Api.csproj" />
   <Project Path="Application/Application.csproj" />
   <Project Path="Infrastructure/Infrastructure.csproj" />
+  <Project Path="ApiTests/ApiTests.csproj" />
 </Solution>
